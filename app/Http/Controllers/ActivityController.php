@@ -111,27 +111,38 @@ class ActivityController extends Controller
     }
 
 
-    public function submitFile(Request $request){
+    public function submitFile(Request $request)
+    {
         $activityId = $request->activityId;
         $activity = Activity::find($activityId);
+
+        // Validate the file upload
+        $request->validate([
+            'fileInput' => 'required|file', // Add additional validation rules as needed
+        ]);
 
         // Retrieve the file object from the request
         $file = $request->file('fileInput');
 
-        // Store the file and get the file path
-        $activityFilePath = $file->store('public');
+        // Get the original filename
+        $originalFilename = $file->getClientOriginalName();
 
-        // Extract the filename from the file path
+        // Store the file with its original name
+        $activityFilePath = $file->storeAs('uploads', $originalFilename, 'public');
+
+        // Extract the filename from the file path (optional, since you already have the original name)
         $activityFileName = basename($activityFilePath);
 
         $user = Auth::user();
         $attempts = $activity->count_attempts($user->id) + 1;
+
+        // Attach the activity data to the user
         $user->attempts()->attach($user, [
             'activity_id' => $activity->id,
             'attempts' => $attempts,
             'score' => 0,
             'maxScore' => 0,
-            'file' => $activityFileName // Store only the filename
+            'file' => $activityFileName, // Use the original filename
         ]);
 
         return redirect('/activity/' . $activityId);

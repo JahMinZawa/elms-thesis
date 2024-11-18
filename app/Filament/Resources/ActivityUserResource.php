@@ -82,7 +82,15 @@ class ActivityUserResource extends Resource
                 Tables\Columns\TextColumn::make('activity.name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\ImageColumn::make('file'),
+                Tables\Columns\TextColumn::make('file')
+                    ->label('File')
+                    ->formatStateUsing(function ($state) {
+                        if ($state) {
+                            return '<a href="' . \Storage::url('uploads/' . $state) . '" target="_blank" class="text-blue-600 underline">Download</a>';
+                        }
+                        return 'No file';
+                    })
+                    ->html(), // Enables HTML rendering for links
                 Tables\Columns\TextColumn::make('attempts')->label("Attempt")
                     ->numeric()
                     ->sortable(),
