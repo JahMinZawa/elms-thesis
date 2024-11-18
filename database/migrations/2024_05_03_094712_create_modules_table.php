@@ -11,11 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('modules', function (Blueprint $table) {
+        Schema::create('lectures', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('module_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->string('description');
-            $table->string('author')->default("SCHOOL");
+            $table->text('content');
+            $table->text('file');
+
             $table->timestamps();
         });
     }
